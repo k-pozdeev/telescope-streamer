@@ -42,18 +42,23 @@
 		#photo-settings .form-row {
 			margin-bottom: 10px;
 		}
-		#photo-settings .form-row input {
+		#photo-settings .form-row input, #photo-settings .form-row select {
 			box-sizing: border-box;
 			width: calc(100% - 20px);
+			height: 30px;
 			margin: 0 10px;
 			border: 1px solid black;
+		}
+		#photo-btn {
+			width: 200px;
+			height: 60px;
 		}
 	</style>
 </head>
 <body>
 	<div id="wrapper">
 		<div id="canvas-wrapper">
-			<canvas id="videoCanvas" width="${WIDTH}" height="${HEIGHT}">
+			<canvas id="videoCanvas">
 				<p>
 					Please use a browser that supports the Canvas Element, like
 					<a href="http://www.google.com/chrome">Chrome</a>,
@@ -65,20 +70,44 @@
 		<div id="side-panel">
 			<div id="photo-settings">
 				<div class="form-row">
-					<label for="form-width">Ширина, px</label>
-					<input type="text" id="form-width" name="width" value="1920" />
-				</div>
-				<div class="form-row">
-					<label for="form-height">Высота, px</label>
-					<input type="text" id="form-height" name="height" value="1080" />
+					<label for="form-size">Размеры, px</label>
+					<select id="form-size" name="size">
+						<option value="4056x3040">4056x3040</option>
+						<option value="2560x1920">2560x1920</option>
+						<option value="1920x1080" selected>1920x1080</option>
+						<option value="1280x720">1280x720</option>
+						<option value="1024x768">1024x768</option>
+						<option value="800x600">800x600</option>
+						<option value="640x480">640x480</option>
+					</select>
 				</div>
 				<div class="form-row">
 					<label for="form-iso">ISO</label>
-					<input type="text" id="form-iso" name="iso" value="600" />
+					<select id="form-iso" name="iso">
+						<option value="100" selected>100</option>
+						<option value="200">200</option>
+						<option value="300">300</option>
+						<option value="400">400</option>
+						<option value="500">500</option>
+						<option value="600">600</option>
+					</select>
 				</div>
 				<div class="form-row">
 					<label for="form-shutter">Экспозиция, секунды</label>
-					<input type="text" id="form-shutter" name="shutter-speed-sec" value="1" />
+					<select id="form-shutter" name="shutter-speed-sec">
+						<option value="1/1000" selected>1/1000</option>
+						<option value="1/500">1/500</option>
+						<option value="1/100">1/100</option>
+						<option value="1/25">1/25</option>
+						<option value="1/4">1/4</option>
+						<option value="1/2">1/2</option>
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+						<option value="6">6</option>
+					</select>
 				</div>
 				<div class="form-row">
 					<button id="photo-btn">PHOTO</button>
@@ -90,74 +119,84 @@
 		</div>
 	</div>
 	<script type="text/javascript" src="jsmpg.js"></script>
-	<script type="text/javascript">
-		async function reloadPhotos() {
-			const response = await fetch('/photos');
-			const list = await response.json();
-
-			const ul = document.querySelector('#links ul');
-			ul.innerHTML = '';
-
-			for (let name of list) {
-				const link = document.createElement("li");
-				link.innerHTML = `<a href="/photo/${name}" target="_blank">${name}</a>`;
-				ul.appendChild(link);
-			}
-		}
-
-		async function resizeCanvas(canvas) {
-			let parentSize = canvas.parentNode.getBoundingClientRect();
-			let baseSide = parentSize.width >= parentSize.height * 1.3333
-				? "height" : "width";
-			if (baseSide == "width") {
-				let base = parentSize.width * 0.8;
-				canvas.style.width = Math.round(base) + "px";
-				canvas.style.height = Math.round(base * 0.75) + "px";
-			} else {
-				let base = parentSize.height * 0.8;
-				canvas.style.height = Math.round(base) + "px";
-				canvas.style.width = Math.round(base * 1.33333) + "px";
-			}
-		}
-
-		// Show loading notice
-		var canvas = document.getElementById('videoCanvas');
-		resizeCanvas(canvas);
-		var ctx = canvas.getContext('2d');
-		ctx.fillStyle = 'white';
-		ctx.fillText('Loading...', canvas.width/2-30, canvas.height/3);
-
-		window.onresize = () => resizeCanvas(canvas);
-
-		// Setup the WebSocket connection and start the player
-		var client = new WebSocket('ws://' + window.location.hostname + ':${WS_PORT}');
-		var player = new jsmpeg(client, {canvas:canvas});
-
-		var photoBtn = document.getElementById('photo-btn');
-		photoBtn.addEventListener('click', async function () {
-			let data = {
-				"width": Number.parseInt(document.querySelector("#form-width").value),
-				"height": Number.parseInt(document.querySelector("#form-height").value),
-				"iso": Number.parseInt(document.querySelector("#form-iso").value),
-				"shutter_speed_sec": Number.parseFloat(document.querySelector("#form-shutter").value)
-			};
-			document.querySelector("#photo-btn").setAttribute("disabled", true);
-			const response = await fetch('/make_photo', {
-				method: "POST",
-				headers: {
-				  "Content-Type": "application/json",
-				},
-				body: JSON.stringify(data)
-			});
-			const respJson = await response.json();
-			const name = respJson.name;
-			alert(name);
-			document.querySelector("#photo-btn").removeAttribute("disabled");
-
-			reloadPhotos();
-		});
-
-		reloadPhotos();
-	</script>
 </body>
+<script type="text/javascript">
+	async function reloadPhotos() {
+        const response = await fetch('/photos');
+        const list = await response.json();
+
+        const ul = document.querySelector('#links ul');
+        ul.innerHTML = '';
+
+        for (let name of list) {
+            const link = document.createElement("li");
+            link.innerHTML = `<a href="/photo/${name}" target="_blank">${name}</a>`;
+            ul.appendChild(link);
+        }
+    }
+
+    async function resizeCanvas(canvas) {
+        let parentSize = canvas.parentNode.getBoundingClientRect();
+        let baseSide = parentSize.width >= parentSize.height * 1.3333
+            ? "height" : "width";
+        if (baseSide == "width") {
+            let base = parentSize.width * 0.8;
+            canvas.style.width = Math.round(base) + "px";
+            canvas.style.height = Math.round(base * 0.75) + "px";
+        } else {
+            let base = parentSize.height * 0.8;
+            canvas.style.height = Math.round(base) + "px";
+            canvas.style.width = Math.round(base * 1.33333) + "px";
+        }
+    }
+
+    // Show loading notice
+    var canvas = document.getElementById('videoCanvas');
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'white';
+    ctx.fillText('Loading...', canvas.width/2-30, canvas.height/3);
+
+    window.onresize = () => resizeCanvas(canvas);
+    resizeCanvas(canvas);
+
+    // Setup the WebSocket connection and start the player
+    var client = new WebSocket('ws://' + window.location.hostname + ':${WS_PORT}');
+    var player = new jsmpeg(client, {canvas:canvas});
+
+    var photoBtn = document.getElementById('photo-btn');
+    photoBtn.addEventListener('click', async function () {
+    	let sizeValue = document.querySelector("#form-size").value;
+    	let [_, width, height] = sizeValue.match(/(\d+)x(\d+)/);
+    	let shutterSpeedValue = document.querySelector("#form-shutter").value;
+    	let shutterSpeedF;
+    	if (shutterSpeedValue.match(/\//)) {
+    		let [_, numerator, denominator] = shutterSpeedValue.match(/(\d+)\/(\d+)/)
+    		shutterSpeedF = Number.parseFloat(numerator) / Number.parseFloat(denominator);
+    	} else {
+    		shutterSpeedF = Number.parseFloat(shutterSpeedValue);
+    	}
+        let data = {
+            "width": Number.parseInt(width),
+            "height": Number.parseInt(height),
+            "iso": Number.parseInt(document.querySelector("#form-iso").value),
+            "shutter_speed_sec": shutterSpeedF
+        };
+        document.querySelector("#photo-btn").setAttribute("disabled", true);
+        const response = await fetch('/make_photo', {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data)
+        });
+        const respJson = await response.json();
+        const name = respJson.name;
+        alert(name);
+        document.querySelector("#photo-btn").removeAttribute("disabled");
+
+        reloadPhotos();
+    });
+
+    reloadPhotos();
+</script>
 </html>
