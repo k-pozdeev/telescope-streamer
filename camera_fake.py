@@ -34,7 +34,7 @@ class Camera(CameraBase):
 
     def wait_recording(self):
         self._lock.acquire(True)
-        sleep(1)
+        sleep(0.5)
         self._lock.release()
 
     def make_photo(self, photo_config: PhotoConfig, path: str):

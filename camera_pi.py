@@ -47,7 +47,10 @@ class Camera(CameraBase):
         tmpcamera.shutter_speed = photo_config.shutter_speed_sec * 1_000_000
         tmpcamera.iso = photo_config.iso
         # warm-up
-        sleep(5)
+        if photo_config.shutter_speed_sec < 1.0:
+            sleep(1)
+        else:
+            sleep(3)
         tmpcamera.capture(path, format='jpeg')
         tmpcamera.close()
         self._camera = self._init_camera()
