@@ -45,7 +45,7 @@ class Camera(CameraBase):
         tmpcamera.resolution = (photo_config.resolution_x, photo_config.resolution_y)
         framerate = 1.0 / photo_config.shutter_speed_sec
         tmpcamera.framerate = Fraction.from_float(min(framerate, 30.0))
-        tmpcamera.shutter_speed = photo_config.shutter_speed_sec * 1_000_000
+        tmpcamera.shutter_speed = int(photo_config.shutter_speed_sec * 1_000_000)
         tmpcamera.iso = photo_config.iso
         # warm-up
         if photo_config.shutter_speed_sec < 1.0:
