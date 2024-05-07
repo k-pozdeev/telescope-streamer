@@ -44,7 +44,7 @@ class Camera(CameraBase):
         tmpcamera = PiCamera(sensor_mode=3)
         tmpcamera.resolution = (photo_config.resolution_x, photo_config.resolution_y)
         framerate = 1.0 / photo_config.shutter_speed_sec
-        tmpcamera.framerate = Fraction.from_float(max(framerate, 30.0))
+        tmpcamera.framerate = Fraction.from_float(min(framerate, 30.0))
         tmpcamera.shutter_speed = photo_config.shutter_speed_sec * 1_000_000
         tmpcamera.iso = photo_config.iso
         # warm-up
