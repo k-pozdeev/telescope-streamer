@@ -80,8 +80,6 @@ class StreamingHttpHandler(BaseHTTPRequestHandler):
             self.wfile.write(content)
 
     def do_POST(self):
-        server_config: ServerConfig = self.server.server_config
-        camera_config: CameraConfig = self.server.camera_config
         camera: CameraBase = self.server.camera
         photo_man: PhotoManager = self.server.photo_man
         content: bytes = b''
@@ -135,5 +133,6 @@ def make_websocket_server(server_config: ServerConfig, camera_config: CameraConf
         handler_class=WebSocketWSGIRequestHandler,
         app=WebSocketWSGIApplication(handler_cls=StreamingWebSocket)
     )
+    websocket_server.initialize_websockets_manager()
     return websocket_server
 

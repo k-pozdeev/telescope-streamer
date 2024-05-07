@@ -18,3 +18,6 @@ class CameraBase(object):
 
     def make_photo(self, photo_config: PhotoConfig, path: str):
         pass
+
+    def destroy(self):
+        pass

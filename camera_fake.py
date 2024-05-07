@@ -8,6 +8,8 @@ from threading import Thread, Lock, Event
 from PIL import Image
 from random import randrange
 from camera_base import CameraBase
+from time import sleep
+
 
 class Camera(CameraBase):
     def __init__(self, camera_config: CameraConfig, consumer: VideoStreamConsumerInterface):
@@ -16,6 +18,7 @@ class Camera(CameraBase):
         self._consumer = consumer
         self._fake_camera_thread = self._init_fake_camera()
         self._fake_camera_interrupt_flag = False
+        self._lock = Lock()
 
     def _init_fake_camera(self) -> Thread:
         fake_camera = Thread(target=self._generate_yuv_stream)
@@ -30,9 +33,12 @@ class Camera(CameraBase):
         self._fake_camera_thread.join()
 
     def wait_recording(self):
-        pass
+        self._lock.acquire(True)
+        sleep(1)
+        self._lock.release()
 
     def make_photo(self, photo_config: PhotoConfig, path: str):
+        self._lock.acquire(True)
         self.stop_stream()
         self._fake_camera_thread = None
 
@@ -41,6 +47,16 @@ class Camera(CameraBase):
 
         self._fake_camera_thread = self._init_fake_camera()
         self.start_stream()
+        self._lock.release()
+
+    def destroy(self):
+        if self._fake_camera_thread is not None:
+            if self._fake_camera_thread.is_alive():
+                self._fake_camera_interrupt_flag = True
+                self._fake_camera_thread.join()
+                self._fake_camera_thread = None
+        if self._lock.locked():
+            self._lock.release()
 
     def _generate_yuv_stream(self):
         width = self._camera_config.resolution_x
@@ -55,6 +71,6 @@ class Camera(CameraBase):
             buff.seek(0)
 
             self._consumer.write(buff.read1())
-            Event().wait(5.0)  # sleep 1 sec
+            Event().wait(3.0)  # sleep 3 sec
             if self._fake_camera_interrupt_flag:
                 break

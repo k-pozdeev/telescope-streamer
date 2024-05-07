@@ -13,6 +13,7 @@ class Camera(CameraBase):
         self._camera_config = camera_config
         self._camera = self._init_camera()
         self._consumer = consumer
+        self._lock = Lock()
         # warm-up
         sleep(1)
 
@@ -29,15 +30,17 @@ class Camera(CameraBase):
         self._camera.stop_recording()
 
     def wait_recording(self):
-        if self._camera is not None:
-            self._camera.wait_recording(1)
-        else:
-            sleep(1)
+        # lock нужен, потому что в другом потоке может быть вызван make_photo, уничтожающий камеру.
+        # При этом упадет с ошибкой метод wait_recording()
+        self._lock.acquire(True)
+        self._camera.wait_recording(1)
+        sleep(1)
+        self._lock.release()
 
     def make_photo(self, photo_config: PhotoConfig, path: str):
+        self._lock.acquire(True)
         self._camera.stop_recording()
         self._camera.close()
-        self._camera = None
         tmpcamera = PiCamera(sensor_mode=3)
         tmpcamera.resolution = (photo_config.resolution_x, photo_config.resolution_y)
         tmpcamera.framerate = Fraction.from_float(1.0 / photo_config.shutter_speed_sec)
@@ -49,3 +52,10 @@ class Camera(CameraBase):
         tmpcamera.close()
         self._camera = self._init_camera()
         self._camera.start_recording(self._consumer, 'yuv')
+        self._lock.release()
+
+    def destroy(self):
+        if self._camera.recording:
+            self._camera.stop_recording()
+        if not self._camera.closed:
+            self._camera.close()

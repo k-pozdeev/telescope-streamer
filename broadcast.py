@@ -1,5 +1,4 @@
 import io
-import os
 from subprocess import Popen, PIPE
 from config import CameraConfig
 from typing import Union
