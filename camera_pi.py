@@ -22,6 +22,7 @@ class Camera(CameraBase):
         camera: PiCamera = PiCamera(sensor_mode=0)
         camera.resolution = (self._camera_config.resolution_x, self._camera_config.resolution_y)
         camera.framerate = self._camera_config.frame_rate
+        camera.iso = 0  # auto
         camera.shutter_speed = 0  # auto
         camera.exposure_mode = 'auto'
         return camera
