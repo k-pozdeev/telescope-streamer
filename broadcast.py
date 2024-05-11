@@ -27,14 +27,14 @@ class FfmpegConverter(VideoStreamConsumerInterface, VideoStreamSourceInterface, 
         print('Spawning background conversion process')
         self.converter = Popen([
             'ffmpeg',
+            '-r', str(camera_config.frame_rate),
             '-f', 'rawvideo',
             '-pix_fmt', 'yuv420p',
             '-s', '%dx%d' % (camera_config.resolution_x, camera_config.resolution_y),
-            '-r', str(camera_config.frame_rate),
             '-i', '-',
             '-f', 'mpeg1video',
             '-b:v', '800k',
-            '-r', str(camera_config.frame_rate),
+            '-r', '20',
             '-'],
             stdin=PIPE, stdout=PIPE, stderr=io.open('ffmpeg.err.log', 'wb'),
             shell=False, close_fds=True)
