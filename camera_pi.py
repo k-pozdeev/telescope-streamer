@@ -22,9 +22,9 @@ class Camera(CameraBase):
         camera: PiCamera = PiCamera(sensor_mode=0)
         camera.resolution = (self._camera_config.resolution_x, self._camera_config.resolution_y)
         camera.framerate = self._camera_config.frame_rate
-        camera.iso = 0  # auto
-        camera.shutter_speed = 0  # auto
         camera.exposure_mode = 'auto'
+        camera.iso = 600
+        camera.shutter_speed = int(1.0 / self._camera_config.frame_rate * 1_000_000)  # auto
         return camera
 
     def start_stream(self):
