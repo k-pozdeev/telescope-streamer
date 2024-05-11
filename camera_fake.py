@@ -9,6 +9,7 @@ from PIL import Image
 from random import randrange
 from camera_base import CameraBase
 from time import sleep
+from typing import Dict, Any
 
 
 class Camera(CameraBase):
@@ -35,6 +36,11 @@ class Camera(CameraBase):
     def wait_recording(self):
         self._lock.acquire(True)
         sleep(0.5)
+        self._lock.release()
+
+    def change_video_settings(self, settings: Dict[str, Any]):
+        self._lock.acquire(True)
+        pass
         self._lock.release()
 
     def make_photo(self, photo_config: PhotoConfig, path: str):

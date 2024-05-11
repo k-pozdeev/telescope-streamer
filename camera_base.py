@@ -1,5 +1,6 @@
 from config import CameraConfig, PhotoConfig
 from broadcast import VideoStreamConsumerInterface
+from typing import Dict, Any
 
 
 class CameraBase(object):
@@ -14,6 +15,9 @@ class CameraBase(object):
         pass
 
     def wait_recording(self):
+        pass
+
+    def change_video_settings(self, settings: Dict[str, Any]):
         pass
 
     def make_photo(self, photo_config: PhotoConfig, path: str):

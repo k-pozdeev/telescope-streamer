@@ -5,6 +5,7 @@ from config import CameraConfig, PhotoConfig
 from time import sleep
 from fractions import Fraction
 from threading import Thread, Lock
+from typing import Dict, Any
 
 
 class Camera(CameraBase):
@@ -35,6 +36,11 @@ class Camera(CameraBase):
         self._lock.acquire(True)
         self._camera.wait_recording(1)
         sleep(1)
+        self._lock.release()
+
+    def change_video_settings(self, settings: Dict[str, Any]):
+        self._lock.acquire(True)
+        self._camera.iso = settings["iso"]
         self._lock.release()
 
     def make_photo(self, photo_config: PhotoConfig, path: str):

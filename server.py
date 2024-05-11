@@ -40,7 +40,7 @@ class StreamingHttpHandler(BaseHTTPRequestHandler):
         camera_config: CameraConfig = self.server.camera_config
         camera: CameraBase = self.server.camera
         photo_man: PhotoManager = self.server.photo_man
-        content: bytes = []
+        content: bytes = bytes([])
 
         if self.path == '/':
             self.send_response(301)
@@ -70,7 +70,7 @@ class StreamingHttpHandler(BaseHTTPRequestHandler):
             self.send_error(404, 'File not found')
             return
         if isinstance(content, str):
-            raise Exception
+            raise Exception('Content must be bytes')
         self.send_response(200)
         self.send_header('Content-Type', content_type)
         self.send_header('Content-Length', str(len(content)))
@@ -93,6 +93,13 @@ class StreamingHttpHandler(BaseHTTPRequestHandler):
             photo_name = f"{datetime.datetime.now():%Y-%m-%d_%H-%M-%S.jpg}"
             camera.make_photo(photo_config, photo_man.full_path(photo_name))
             content = json.dumps({"name": photo_name}).encode('UTF-8')
+        elif self.path == '/video_settings':
+            content_len = int(self.headers.get('Content-Length'))
+            post_body = self.rfile.read(content_len)
+            data = json.loads(post_body)
+            iso = data["iso"]
+            camera.change_video_settings({"iso": iso})
+            content = json.dumps({"status": "ok"}).encode('UTF-8')
 
         self.send_response(200)
         self.send_header('Content-Type', content_type)
