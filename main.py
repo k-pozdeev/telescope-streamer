@@ -15,7 +15,7 @@ except ImportError:
 
 photo_man = PhotoManager("./photo")
 server_config = ServerConfig("0.0.0.0", 8082, 8084)
-camera_config = CameraConfig(640, 480, 30)
+camera_config = CameraConfig(640, 480, 5)
 ffmpeg_converter = FfmpegConverter(camera_config)
 camera = Camera(camera_config, ffmpeg_converter)
 
