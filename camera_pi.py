@@ -23,8 +23,8 @@ class Camera(CameraBase):
         camera.resolution = (self._camera_config.resolution_x, self._camera_config.resolution_y)
         camera.framerate = self._camera_config.frame_rate
         camera.exposure_mode = 'auto'
-        camera.iso = 600
-        camera.shutter_speed = int(1.0 / self._camera_config.frame_rate * 1_000_000)  # auto
+        camera.iso = 0  # auto
+        camera.shutter_speed = int(1.0 / self._camera_config.frame_rate * 1_000_000)
         return camera
 
     def start_stream(self):
