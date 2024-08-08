@@ -2,13 +2,14 @@
     margin: 0;
     padding: 0;
     border: 0;
+    color: #aaa;
 }
 html, body {
     height: 100%;
     width: 100%;
 }
 body {
-    background: white;
+    background: black;
     text-align: center;
 }
 #wrapper {
@@ -42,8 +43,12 @@ body {
     height: 30px;
     margin: 0 10px;
     border: 1px solid black;
+    background-color: #888;
+    color: black;
 }
 .form-btn {
     width: 200px;
     height: 60px;
+    background-color: #888;
+    color: black;
 }
