@@ -1,11 +1,11 @@
-from config import CameraConfig, PhotoConfig
+from config import VideoConfig, PhotoConfig
 from broadcast import VideoStreamConsumerInterface
 from typing import Dict, Any
 
 
 class CameraBase(object):
     """Интерфейс обертки камеры Raspberry PI"""
-    def __init__(self, camera_config: CameraConfig, consumer: VideoStreamConsumerInterface):
+    def __init__(self, video_config: VideoConfig, consumer: VideoStreamConsumerInterface):
         pass
 
     def start_stream(self):

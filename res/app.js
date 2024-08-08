@@ -35,27 +35,16 @@ ctx.fillText('Loading...', canvas.width/2-30, canvas.height/3);
 window.onresize = () => resizeCanvas(canvas);
 resizeCanvas(canvas);
 
-// Setup the WebSocket connection and start the player
-var client = new WebSocket('ws://' + window.location.hostname + ':8084');
-var player = new jsmpeg(client, {canvas:canvas});
-
 var photoBtn = document.getElementById('photo-btn');
 photoBtn.addEventListener('click', async function () {
     let sizeValue = document.querySelector("#form-size").value;
     let [_, width, height] = sizeValue.match(/(\d+)x(\d+)/);
     let shutterSpeedStr = document.querySelector("#form-shutter").value;
-    let shutterSpeedF;
-    if (shutterSpeedStr.match(/\//)) {
-        let [_, numerator, denominator] = shutterSpeedStr.match(/(\d+)\/(\d+)/)
-        shutterSpeedF = Number.parseFloat(numerator) / Number.parseFloat(denominator);
-    } else {
-        shutterSpeedF = Number.parseFloat(shutterSpeedStr);
-    }
     let data = {
         "width": Number.parseInt(width),
         "height": Number.parseInt(height),
         "iso": Number.parseInt(document.querySelector("#form-iso").value),
-        "shutter_speed_sec": shutterSpeedF
+        "shutter_speed_sec": shutterSpeedStr
     };
     document.querySelector("#photo-btn").setAttribute("disabled", true);
     const response = await fetch('/make_photo', {
@@ -91,4 +80,23 @@ videoBtn.addEventListener('click', async function () {
     alert(status);
     document.querySelector("#video-btn").removeAttribute("disabled");
 });
-reloadPhotos();
+
+var config, client, player;
+
+async function setUp() {
+    config = await fetch('/config');
+    config = await config.json();
+
+    document.querySelector('#form-video-iso').value = config['camera_video_iso'];
+    document.querySelector('#form-size').value = config['camera_photo_resolution_x'] + 'x' + config['camera_photo_resolution_y'];
+    document.querySelector('#form-iso').value = config['camera_photo_iso'];
+    document.querySelector('#form-shutter').value = config['camera_photo_shutter_speed_sec'];
+
+    // Setup the WebSocket connection and start the player
+    client = new WebSocket('ws://' + window.location.hostname + ':' + config["server_ws_port"]);
+    player = new jsmpeg(client, {canvas:canvas});
+
+    reloadPhotos();
+}
+
+setUp();

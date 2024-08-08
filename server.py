@@ -1,4 +1,4 @@
-from config import ServerConfig, CameraConfig, PhotoConfig
+from config import ServerConfig, VideoConfig, PhotoConfig, ConfigManager
 from photoman import PhotoManager
 from camera_base import CameraBase
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -19,14 +19,6 @@ import datetime
 import json
 import re
 
-###########################################
-# CONFIGURATION
-COLOR = u'#444'
-BGCOLOR = u'#333'
-
-
-###########################################
-
 
 def read_resource(name: str) -> str:
     with open("./res/" + name) as f:
@@ -38,8 +30,9 @@ class StreamingHttpHandler(BaseHTTPRequestHandler):
         self.do_GET()
 
     def do_GET(self):
+        config_manager: ConfigManager = self.server.config_manager
         server_config: ServerConfig = self.server.server_config
-        camera_config: CameraConfig = self.server.camera_config
+        video_config: VideoConfig = self.server.video_config
         camera: CameraBase = self.server.camera
         photo_man: PhotoManager = self.server.photo_man
         content: bytes = b''
@@ -65,6 +58,9 @@ class StreamingHttpHandler(BaseHTTPRequestHandler):
             photo_name = self.path.replace('/photo/', '')
             content = photo_man.get_photo_as_bytes(photo_name)
             content_type = "image/jpeg"
+        elif self.path == '/config':
+            content = json.dumps(config_manager.get_dict()).encode('UTF-8')
+            content_type = 'application/json; charset=UTF-8'
         else:
             self.send_error(404, 'File not found')
             return
@@ -79,6 +75,7 @@ class StreamingHttpHandler(BaseHTTPRequestHandler):
             self.wfile.write(content)
 
     def do_POST(self):
+        config_manager: ConfigManager = self.server.config_manager
         camera: CameraBase = self.server.camera
         photo_man: PhotoManager = self.server.photo_man
         content: bytes = b''
@@ -88,10 +85,20 @@ class StreamingHttpHandler(BaseHTTPRequestHandler):
             content_len = int(self.headers.get('Content-Length'))
             post_body = self.rfile.read(content_len)
             data = json.loads(post_body)
-            photo_config = PhotoConfig(data['width'], data['height'], data['iso'], data['shutter_speed_sec'])
+            if m := re.match(r'(\d+)/(\d+)', data['shutter_speed_sec']):
+                shutter_speed_f = float(m.group(1)) / float(m.group(2))
+            else:
+                shutter_speed_f = float(data['shutter_speed_sec'])
+            photo_config = PhotoConfig(data['width'], data['height'], data['iso'], shutter_speed_f)
             photo_name = f"{datetime.datetime.now():%Y-%m-%d_%H-%M-%S.jpg}"
             camera.make_photo(photo_config, photo_man.full_path(photo_name))
             content = json.dumps({"name": photo_name}).encode('UTF-8')
+            config_manager.set_vals({
+                "camera_photo_resolution_x": data['width'],
+                "camera_photo_resolution_y": data['height'],
+                "camera_photo_iso": data['iso'],
+                "camera_photo_shutter_speed_sec": data['shutter_speed_sec'],
+            })
         elif self.path == '/video_settings':
             content_len = int(self.headers.get('Content-Length'))
             post_body = self.rfile.read(content_len)
@@ -99,6 +106,7 @@ class StreamingHttpHandler(BaseHTTPRequestHandler):
             iso = data["iso"]
             camera.change_video_settings({"iso": iso})
             content = json.dumps({"status": "ok"}).encode('UTF-8')
+            config_manager.set_val("camera_video_iso", iso)
 
         self.send_response(200)
         self.send_header('Content-Type', content_type)
@@ -118,20 +126,27 @@ class StreamingWebSocket(WebSocket):
         self.send(self.jsmpeg_header.pack(self.jsmpeg_magic, self.width, self.height), binary=True)
 
 
-def make_http_server(server_config: ServerConfig, camera_config: CameraConfig, camera, photo_man) -> HTTPServer:
+def make_http_server(
+        config_manager: ConfigManager,
+        server_config: ServerConfig,
+        video_config: VideoConfig,
+        camera: CameraBase,
+        photo_man: PhotoManager
+) -> HTTPServer:
     server = HTTPServer((server_config.host, server_config.http_port), StreamingHttpHandler)
     # for handler
+    server.config_manager = config_manager
     server.server_config = server_config
-    server.camera_config = camera_config
+    server.video_config = video_config
     server.camera = camera
     server.photo_man = photo_man
     return server
 
 
-def make_websocket_server(server_config: ServerConfig, camera_config: CameraConfig) -> WSGIServer:
+def make_websocket_server(server_config: ServerConfig, video_config: VideoConfig) -> WSGIServer:
     print('Initializing websockets server on port %d' % server_config.ws_port)
-    StreamingWebSocket.width = camera_config.resolution_x
-    StreamingWebSocket.height = camera_config.resolution_y
+    StreamingWebSocket.width = video_config.resolution_x
+    StreamingWebSocket.height = video_config.resolution_y
     WebSocketWSGIHandler.http_version = '1.1'
     websocket_server = make_server(
         '', server_config.ws_port,

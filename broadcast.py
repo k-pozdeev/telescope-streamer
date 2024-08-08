@@ -1,6 +1,6 @@
 import io
 from subprocess import Popen, PIPE
-from config import CameraConfig
+from config import VideoConfig
 from typing import Union
 from threading import Thread, Event
 from time import sleep
@@ -23,14 +23,14 @@ class StoppableInterface:
 
 
 class FfmpegConverter(VideoStreamConsumerInterface, VideoStreamSourceInterface, StoppableInterface):
-    def __init__(self, camera_config: CameraConfig):
+    def __init__(self, video_config: VideoConfig):
         print('Spawning background conversion process')
         self.converter = Popen([
             'ffmpeg',
-            '-r', str(camera_config.frame_rate),
+            '-r', str(video_config.frame_rate),
             '-f', 'rawvideo',
             '-pix_fmt', 'yuv420p',
-            '-s', '%dx%d' % (camera_config.resolution_x, camera_config.resolution_y),
+            '-s', '%dx%d' % (video_config.resolution_x, video_config.resolution_y),
             '-i', '-',
             '-f', 'mpeg1video',
             '-b:v', '800k',

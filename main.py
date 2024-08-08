@@ -1,4 +1,4 @@
-from config import ServerConfig, CameraConfig
+from config import ServerConfig, VideoConfig, ConfigManager
 from server import make_http_server, make_websocket_server
 from threading import Thread
 from broadcast import WebsocketBroadcaster, FfmpegConverter
@@ -13,17 +13,29 @@ try:
 except ImportError:
     from camera_fake import Camera
 
+config_manager = ConfigManager("config.json")
+config_dict = config_manager.get_dict()
+
 photo_man = PhotoManager("./photo")
-server_config = ServerConfig("0.0.0.0", 8082, 8084)
-camera_config = CameraConfig(640, 480, 5)
-ffmpeg_converter = FfmpegConverter(camera_config)
-camera = Camera(camera_config, ffmpeg_converter)
+server_config = ServerConfig(
+    config_dict["server_host"],
+    config_dict["server_http_port"],
+    config_dict["server_ws_port"]
+)
+video_config = VideoConfig(
+    config_dict["camera_video_resolution_x"],
+    config_dict["camera_video_resolution_y"],
+    config_dict["camera_video_iso"],
+    config_dict["camera_video_frame_rate"]
+)
+ffmpeg_converter = FfmpegConverter(video_config)
+camera = Camera(video_config, ffmpeg_converter)
 
 print('Initializing HTTP server')
-http_server = make_http_server(server_config, camera_config, camera, photo_man)
+http_server = make_http_server(config_manager, server_config, video_config, camera, photo_man)
 http_thread = Thread(target=http_server.serve_forever)
 
-websocket_server = make_websocket_server(server_config, camera_config)
+websocket_server = make_websocket_server(server_config, video_config)
 websocket_thread = Thread(target=websocket_server.serve_forever)
 
 websocket_broadcaster = WebsocketBroadcaster(ffmpeg_converter, websocket_server)

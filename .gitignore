@@ -4,4 +4,5 @@ photo/*.png
 venv/
 __pycache__/
 .idea/
+config.json
 ffmpeg.err.log

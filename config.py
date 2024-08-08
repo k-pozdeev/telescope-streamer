@@ -1,4 +1,5 @@
-from fractions import Fraction
+from typing import Dict, Any
+import json
 
 
 class ServerConfig:
@@ -8,10 +9,11 @@ class ServerConfig:
         self.ws_port = ws_port
 
 
-class CameraConfig:
-    def __init__(self, resolution_x: int, resolution_y: int, frame_rate: int):
+class VideoConfig:
+    def __init__(self, resolution_x: int, resolution_y: int, iso: int, frame_rate: int):
         self.resolution_x = resolution_x
         self.resolution_y = resolution_y
+        self.iso = iso
         self.frame_rate = frame_rate
 
 
@@ -21,3 +23,29 @@ class PhotoConfig:
         self.resolution_y = resolution_y
         self.iso = iso
         self.shutter_speed_sec = shutter_speed_sec
+
+
+class ConfigManager:
+    def __init__(self, path: str):
+        self.path = path
+        with open(path, "r") as f:
+            self.config = json.load(f)
+
+    def get_dict(self) -> Dict:
+        return self.config
+
+    def get_val(self, key: str):
+        return self.config[key]
+
+    def set_val(self, key: str, val: Any):
+        self.config[key] = val
+        with open(self.path, "w") as f:
+            config_str = json.dumps(self.config, indent=4)
+            f.write(config_str)
+
+    def set_vals(self, vals: Dict):
+        for key, val in vals.items():
+            self.config[key] = val
+        with open(self.path, "w") as f:
+            config_str = json.dumps(self.config, indent=4)
+            f.write(config_str)

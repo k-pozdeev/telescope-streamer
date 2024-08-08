@@ -2,7 +2,7 @@ import io
 import numpy as np
 import yuvio
 from broadcast import VideoStreamConsumerInterface
-from config import CameraConfig, PhotoConfig
+from config import VideoConfig, PhotoConfig
 from fractions import Fraction
 from threading import Thread, Lock, Event
 from PIL import Image
@@ -13,9 +13,9 @@ from typing import Dict, Any
 
 
 class Camera(CameraBase):
-    def __init__(self, camera_config: CameraConfig, consumer: VideoStreamConsumerInterface):
-        super().__init__(camera_config, consumer)
-        self._camera_config = camera_config
+    def __init__(self, video_config: VideoConfig, consumer: VideoStreamConsumerInterface):
+        super().__init__(video_config, consumer)
+        self._video_config = video_config
         self._consumer = consumer
         self._fake_camera_thread = self._init_fake_camera()
         self._fake_camera_interrupt_flag = False
@@ -65,8 +65,8 @@ class Camera(CameraBase):
             self._lock.release()
 
     def _generate_yuv_stream(self):
-        width = self._camera_config.resolution_x
-        height = self._camera_config.resolution_y
+        width = self._video_config.resolution_x
+        height = self._video_config.resolution_y
         while True:
             y = randrange(255) * np.ones((width, height), dtype=np.uint8)
             u = randrange(255) * np.ones((width // 2, height // 2), dtype=np.uint8)

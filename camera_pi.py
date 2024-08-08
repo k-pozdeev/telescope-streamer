@@ -1,7 +1,7 @@
 from picamera import PiCamera
 from camera_base import CameraBase
 from broadcast import VideoStreamConsumerInterface
-from config import CameraConfig, PhotoConfig
+from config import VideoConfig, PhotoConfig
 from time import sleep
 from fractions import Fraction
 from threading import Thread, Lock
@@ -9,9 +9,9 @@ from typing import Dict, Any
 
 
 class Camera(CameraBase):
-    def __init__(self, camera_config: CameraConfig, consumer: VideoStreamConsumerInterface):
-        super().__init__(camera_config, consumer)
-        self._camera_config = camera_config
+    def __init__(self, video_config: VideoConfig, consumer: VideoStreamConsumerInterface):
+        super().__init__(video_config, consumer)
+        self._video_config = video_config
         self._camera = self._init_camera()
         self._consumer = consumer
         self._lock = Lock()
@@ -20,11 +20,11 @@ class Camera(CameraBase):
 
     def _init_camera(self) -> PiCamera:
         camera: PiCamera = PiCamera(sensor_mode=0)
-        camera.resolution = (self._camera_config.resolution_x, self._camera_config.resolution_y)
-        camera.framerate = self._camera_config.frame_rate
+        camera.resolution = (self._video_config.resolution_x, self._video_config.resolution_y)
+        camera.framerate = self._video_config.frame_rate
         camera.exposure_mode = 'auto'
-        camera.iso = 0  # auto
-        camera.shutter_speed = int(1.0 / self._camera_config.frame_rate * 1_000_000)
+        camera.iso = self._video_config.iso
+        camera.shutter_speed = int(1.0 / self._video_config.frame_rate * 1_000_000)
         return camera
 
     def start_stream(self):

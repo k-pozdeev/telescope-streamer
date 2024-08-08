@@ -33,6 +33,7 @@ body {
 #videoCanvas {
     height: 80%;
     width: 80%;
+    border: 1px solid #aaa;
 }
 .form-row {
     margin-bottom: 10px;
