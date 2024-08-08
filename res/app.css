@@ -1,0 +1,49 @@
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+html, body {
+    height: 100%;
+    width: 100%;
+}
+body {
+    background: white;
+    text-align: center;
+}
+#wrapper {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+#canvas-wrapper {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#side-panel {
+    flex-basis: 250px;
+    flex-grow: 0;
+    box-sizing: border-box;
+    padding: 10px;
+}
+#videoCanvas {
+    height: 80%;
+    width: 80%;
+}
+.form-row {
+    margin-bottom: 10px;
+}
+.form-row input, .form-row select {
+    box-sizing: border-box;
+    width: calc(100% - 20px);
+    height: 30px;
+    margin: 0 10px;
+    border: 1px solid black;
+}
+.form-btn {
+    width: 200px;
+    height: 60px;
+}

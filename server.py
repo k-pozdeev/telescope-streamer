@@ -17,12 +17,14 @@ from string import Template
 from time import sleep, time
 import datetime
 import json
-
+import re
 
 ###########################################
 # CONFIGURATION
 COLOR = u'#444'
 BGCOLOR = u'#333'
+
+
 ###########################################
 
 
@@ -40,25 +42,22 @@ class StreamingHttpHandler(BaseHTTPRequestHandler):
         camera_config: CameraConfig = self.server.camera_config
         camera: CameraBase = self.server.camera
         photo_man: PhotoManager = self.server.photo_man
-        content: bytes = bytes([])
+        content: bytes = b''
 
         if self.path == '/':
             self.send_response(301)
             self.send_header('Location', '/index.html')
             self.end_headers()
             return
-        elif self.path == '/jsmpg.js':
-            content_type = 'application/javascript'
-            content = read_resource("jsmpg.js").encode('UTF-8')
-        elif self.path == '/index.html':
-            content_type = 'text/html; charset=utf-8'
-            tpl = Template(read_resource("index.html"))
-            content = tpl.safe_substitute(dict(
-                WS_PORT=server_config.ws_port,
-                WIDTH=camera_config.resolution_x,
-                HEIGHT=camera_config.resolution_y,
-                COLOR=COLOR,
-                BGCOLOR=BGCOLOR)).encode('UTF-8')
+        elif m := re.match(r'^/([a-z0-9]+\.(html|css|js))$', self.path):
+            file_name = m.group(1)
+            file_ext = m.group(2)
+            content_type = {
+                "html": "text/html",
+                "css": "text/css",
+                "js": "application/javascript"
+            }[file_ext] + "; charset=utf-8"
+            content = read_resource(file_name).encode('UTF-8')
         elif self.path == '/photos':
             content_type = 'application/json; charset=utf-8'
             content = json.dumps(photo_man.list_photos()).encode('UTF-8')
@@ -142,4 +141,3 @@ def make_websocket_server(server_config: ServerConfig, camera_config: CameraConf
     )
     websocket_server.initialize_websockets_manager()
     return websocket_server
-
