@@ -36,7 +36,6 @@ class FfmpegConverter(VideoStreamConsumerInterface, VideoStreamSourceInterface, 
             '-q:v', '0',
             '-r', '5',
             '-strict', 'unofficial',
-            '-b:v', '4000k',
             '-'],
             stdin=PIPE, stdout=PIPE, stderr=io.open('ffmpeg.err.log', 'wb'),
             shell=False, close_fds=True)
