@@ -31,7 +31,7 @@ class Camera(CameraBase):
         camera.framerate = self._video_config.frame_rate
         camera.exposure_mode = self._video_config.exposure_mode
         camera.iso = self._video_config.iso
-        camera.shutter_speed = int(1.0 / self._video_config.shutter_speed_sec * 1_000_000)
+        camera.shutter_speed = int(self._video_config.shutter_speed_sec * 1_000_000)
         camera.image_denoise = False
         return camera
 
@@ -102,7 +102,7 @@ class PhotoStreamCamera(CameraBase):
         camera.framerate = self._video_config.frame_rate
         camera.exposure_mode = self._video_config.exposure_mode
         camera.iso = self._video_config.iso
-        camera.shutter_speed = int(1.0 / self._video_config.shutter_speed_sec * 1_000_000)
+        camera.shutter_speed = int(self._video_config.shutter_speed_sec * 1_000_000)
         camera.image_denoise = False
         self._camera = camera
 
