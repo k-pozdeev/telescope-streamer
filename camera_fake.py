@@ -12,6 +12,10 @@ from time import sleep
 from typing import Dict, Any
 
 
+def fabric(video_config: VideoConfig, consumer: VideoStreamConsumerInterface):
+    return Camera(video_config, consumer)
+
+
 class Camera(CameraBase):
     def __init__(self, video_config: VideoConfig, consumer: VideoStreamConsumerInterface):
         super().__init__(video_config, consumer)

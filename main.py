@@ -5,14 +5,6 @@ from broadcast import WebsocketBroadcaster, FfmpegConverter
 from photoman import PhotoManager
 from time import sleep
 
-
-# PiCamera нельзя установить на десктоп, поэтому на десктопе импортируем заглушку
-try:
-    from picamera import PiCamera
-    from camera_pi import Camera
-except ImportError:
-    from camera_fake import Camera
-
 config_manager = ConfigManager("config.json")
 config_dict = config_manager.get_dict()
 
@@ -27,10 +19,19 @@ video_config = VideoConfig(
     config_dict["camera_video_resolution_y"],
     config_dict["camera_video_iso"],
     config_dict["camera_video_frame_rate"],
-    config_dict["camera_video_exposure_mode"]
+    config_dict["camera_video_exposure_mode"],
+    config_dict["camera_video_shutter_speed_sec"],
+    config_dict["camera_video_mode"]
 )
+
+# PiCamera нельзя установить на десктоп, поэтому на десктопе импортируем заглушку
+try:
+    from camera_pi import fabric
+except ImportError:
+    from camera_fake import fabric
+
 ffmpeg_converter = FfmpegConverter(video_config)
-camera = Camera(video_config, ffmpeg_converter)
+camera = fabric(video_config, ffmpeg_converter)
 
 print('Initializing HTTP server')
 http_server = make_http_server(config_manager, server_config, video_config, camera, photo_man)

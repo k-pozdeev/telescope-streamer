@@ -109,6 +109,7 @@ class StreamingHttpHandler(BaseHTTPRequestHandler):
             camera.change_video_settings({"iso": iso, "exposure_mode": exposure_mode})
             content = json.dumps({"status": "ok"}).encode('UTF-8')
             config_manager.set_val("camera_video_iso", iso)
+            config_manager.set_val("camera_video_exposure_mode", exposure_mode)
 
         self.send_response(200)
         self.send_header('Content-Type', content_type)

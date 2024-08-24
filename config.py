@@ -10,12 +10,23 @@ class ServerConfig:
 
 
 class VideoConfig:
-    def __init__(self, resolution_x: int, resolution_y: int, iso: int, frame_rate: int, exposure_mode: str):
+    def __init__(
+            self,
+            resolution_x: int,
+            resolution_y: int,
+            iso: int,
+            frame_rate: int,
+            exposure_mode: str,
+            shutter_speed_sec: float,
+            mode: str
+    ):
         self.resolution_x = resolution_x
         self.resolution_y = resolution_y
         self.iso = iso
         self.frame_rate = frame_rate
         self.exposure_mode = exposure_mode
+        self.shutter_speed_sec = shutter_speed_sec
+        self.mode = mode
 
 
 class PhotoConfig:
