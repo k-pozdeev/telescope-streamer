@@ -122,8 +122,8 @@ class StreamingHttpHandler(BaseHTTPRequestHandler):
 class StreamingWebSocket(WebSocket):
     jsmpeg_magic = b'jsmp'
     jsmpeg_header = Struct('>4sHH')
-    width = 1024
-    height = 768
+    width = 1280
+    height = 720
 
     def opened(self):
         self.send(self.jsmpeg_header.pack(self.jsmpeg_magic, self.width, self.height), binary=True)
