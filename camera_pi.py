@@ -22,9 +22,9 @@ class Camera(CameraBase):
         camera: PiCamera = PiCamera(sensor_mode=0)
         camera.resolution = (self._video_config.resolution_x, self._video_config.resolution_y)
         camera.framerate = self._video_config.frame_rate
-        camera.exposure_mode = 'night'
+        camera.exposure_mode = self._video_config.exposure_mode
         camera.iso = self._video_config.iso
-        camera.shutter_speed = 0  # int(1.0 / self._video_config.frame_rate * 1_000_000)
+        camera.shutter_speed = int(1.0 / self._video_config.frame_rate * 1_000_000)
         camera.image_denoise = False
         return camera
 
@@ -37,14 +37,15 @@ class Camera(CameraBase):
     def wait_recording(self):
         # lock нужен, потому что в другом потоке может быть вызван make_photo, уничтожающий камеру.
         # При этом упадет с ошибкой метод wait_recording()
-        self._lock.acquire(True)
-        self._camera.wait_recording(1)
+        # self._lock.acquire(True)
+        # self._camera.wait_recording(1)
         sleep(1)
-        self._lock.release()
+        # self._lock.release()
 
     def change_video_settings(self, settings: Dict[str, Any]):
         self._lock.acquire(True)
         self._camera.iso = settings["iso"]
+        self._camera.exposure_mode = settings["exposure_mode"]
         self._lock.release()
 
     def make_photo(self, photo_config: PhotoConfig, path: str):
@@ -53,15 +54,15 @@ class Camera(CameraBase):
         self._camera.close()
         tmpcamera = PiCamera(sensor_mode=3)
         tmpcamera.resolution = (photo_config.resolution_x, photo_config.resolution_y)
-        framerate = 1.0 / photo_config.shutter_speed_sec
-        tmpcamera.framerate = Fraction.from_float(min(framerate, 30.0))
+        tmpcamera.framerate = Fraction.from_float(min(1.0 / photo_config.shutter_speed_sec, 30.0))
         tmpcamera.shutter_speed = int(photo_config.shutter_speed_sec * 1_000_000)
         tmpcamera.iso = photo_config.iso
+        tmpcamera.exposure_mode = photo_config.exposure_mode
         # warm-up
-        if photo_config.shutter_speed_sec < 1.0:
-            sleep(1)
-        else:
-            sleep(3)
+        # if photo_config.shutter_speed_sec < 1.0:
+        #     sleep(1)
+        # else:
+        #     sleep(3)
         tmpcamera.capture(path, format='jpeg')
         tmpcamera.close()
         self._camera = self._init_camera()

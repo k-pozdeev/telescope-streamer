@@ -10,19 +10,21 @@ class ServerConfig:
 
 
 class VideoConfig:
-    def __init__(self, resolution_x: int, resolution_y: int, iso: int, frame_rate: int):
+    def __init__(self, resolution_x: int, resolution_y: int, iso: int, frame_rate: int, exposure_mode: str):
         self.resolution_x = resolution_x
         self.resolution_y = resolution_y
         self.iso = iso
         self.frame_rate = frame_rate
+        self.exposure_mode = exposure_mode
 
 
 class PhotoConfig:
-    def __init__(self, resolution_x: int, resolution_y: int, iso: int, shutter_speed_sec: float):
+    def __init__(self, resolution_x: int, resolution_y: int, iso: int, shutter_speed_sec: float, exposure_mode: str):
         self.resolution_x = resolution_x
         self.resolution_y = resolution_y
         self.iso = iso
         self.shutter_speed_sec = shutter_speed_sec
+        self.exposure_mode = exposure_mode
 
 
 class ConfigManager:

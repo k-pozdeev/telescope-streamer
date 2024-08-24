@@ -26,7 +26,8 @@ video_config = VideoConfig(
     config_dict["camera_video_resolution_x"],
     config_dict["camera_video_resolution_y"],
     config_dict["camera_video_iso"],
-    config_dict["camera_video_frame_rate"]
+    config_dict["camera_video_frame_rate"],
+    config_dict["camera_video_exposure_mode"]
 )
 ffmpeg_converter = FfmpegConverter(video_config)
 camera = Camera(video_config, ffmpeg_converter)

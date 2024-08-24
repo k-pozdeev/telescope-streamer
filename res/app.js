@@ -16,11 +16,11 @@ async function resizeCanvas(canvas) {
     let parentRect = canvas.parentNode.getBoundingClientRect();
     let baseSide = parentRect.width >= parentRect.height * 1.3333 ? "height" : "width";
     if (baseSide === "width") {
-        let base = parentRect.width * 0.8;
+        let base = parentRect.width * 0.9;
         canvas.style.width = Math.round(base) + "px";
         canvas.style.height = Math.round(base * 0.75) + "px";
     } else {
-        let base = parentRect.height * 0.8;
+        let base = parentRect.height * 0.9;
         canvas.style.height = Math.round(base) + "px";
         canvas.style.width = Math.round(base * 1.33333) + "px";
     }
@@ -37,14 +37,13 @@ resizeCanvas(canvas);
 
 var photoBtn = document.getElementById('photo-btn');
 photoBtn.addEventListener('click', async function () {
-    let sizeValue = document.querySelector("#form-size").value;
-    let [_, width, height] = sizeValue.match(/(\d+)x(\d+)/);
-    let shutterSpeedStr = document.querySelector("#form-shutter").value;
+    let [_, width, height] = document.querySelector("#form-photo-size").value.match(/(\d+)x(\d+)/);
     let data = {
         "width": Number.parseInt(width),
         "height": Number.parseInt(height),
-        "iso": Number.parseInt(document.querySelector("#form-iso").value),
-        "shutter_speed_sec": shutterSpeedStr
+        "iso": Number.parseInt(document.querySelector("#form-photo-iso").value),
+        "shutter_speed_sec": document.querySelector("#form-photo-shutter").value,
+        "exposure_mode": document.querySelector("#form-photo-exposure-mode").value
     };
     document.querySelector("#photo-btn").setAttribute("disabled", true);
     const response = await fetch('/make_photo', {
@@ -66,6 +65,7 @@ var videoBtn = document.getElementById('video-btn');
 videoBtn.addEventListener('click', async function () {
     let data = {
         "iso": Number.parseInt(document.querySelector("#form-video-iso").value),
+        "exposure_mode": document.querySelector('#form-video-exposure-mode').value
     };
     document.querySelector("#video-btn").setAttribute("disabled", true);
     const response = await fetch('/video_settings', {
@@ -87,10 +87,13 @@ async function setUp() {
     config = await fetch('/config');
     config = await config.json();
 
+    document.querySelector('#form-video-exposure-mode').value = config['camera_video_exposure_mode'];
     document.querySelector('#form-video-iso').value = config['camera_video_iso'];
-    document.querySelector('#form-size').value = config['camera_photo_resolution_x'] + 'x' + config['camera_photo_resolution_y'];
-    document.querySelector('#form-iso').value = config['camera_photo_iso'];
-    document.querySelector('#form-shutter').value = config['camera_photo_shutter_speed_sec'];
+
+    document.querySelector('#form-photo-size').value = config['camera_photo_resolution_x'] + 'x' + config['camera_photo_resolution_y'];
+    document.querySelector('#form-photo-exposure-mode').value = config['camera_photo_exposure_mode'];
+    document.querySelector('#form-photo-iso').value = config['camera_photo_iso'];
+    document.querySelector('#form-photo-shutter').value = config['camera_photo_shutter_speed_sec'];
 
     // Setup the WebSocket connection and start the player
     client = new WebSocket('ws://' + window.location.hostname + ':' + config["server_ws_port"]);

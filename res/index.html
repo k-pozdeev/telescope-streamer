@@ -20,6 +20,24 @@
     <div id="side-panel">
         <div id="video-settings">
             <div class="form-row">
+                <label for="form-video-exposure-mode">Exposure mode</label>
+                <select id="form-video-exposure-mode" name="video-exposure-mode">
+                    <option value="off">off</option>
+                    <option value="auto">auto</option>
+                    <option value="night">night</option>
+                    <option value="nightpreview">nightpreview</option>
+                    <option value="backlight">backlight</option>
+                    <option value="spotlight">spotlight</option>
+                    <option value="sports">sports</option>
+                    <option value="snow">snow</option>
+                    <option value="beach">beach</option>
+                    <option value="verylong">verylong</option>
+                    <option value="fixedfps">fixedfps</option>
+                    <option value="antishake">antishake</option>
+                    <option value="fireworks">fireworks</option>
+                </select>
+            </div>
+            <div class="form-row">
                 <label for="form-video-iso">ISO</label>
                 <select id="form-video-iso" name="video-iso">
                     <option value="0">AUTO</option>
@@ -42,8 +60,8 @@
         </div>
         <div id="photo-settings">
             <div class="form-row">
-                <label for="form-size">Размеры, px</label>
-                <select id="form-size" name="size">
+                <label for="form-photo-size">Размеры, px</label>
+                <select id="form-photo-size" name="size">
                     <option value="4056x3040">4056x3040</option>
                     <option value="2560x1920">2560x1920</option>
                     <option value="1920x1080">1920x1080</option>
@@ -54,8 +72,26 @@
                 </select>
             </div>
             <div class="form-row">
-                <label for="form-iso">ISO</label>
-                <select id="form-iso" name="iso">
+                <label for="form-photo-exposure-mode">Exposure mode</label>
+                <select id="form-photo-exposure-mode" name="photo-exposure-mode">
+                    <option value="off">off</option>
+                    <option value="auto">auto</option>
+                    <option value="night">night</option>
+                    <option value="nightpreview">nightpreview</option>
+                    <option value="backlight">backlight</option>
+                    <option value="spotlight">spotlight</option>
+                    <option value="sports">sports</option>
+                    <option value="snow">snow</option>
+                    <option value="beach">beach</option>
+                    <option value="verylong">verylong</option>
+                    <option value="fixedfps">fixedfps</option>
+                    <option value="antishake">antishake</option>
+                    <option value="fireworks">fireworks</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <label for="form-photo-iso">ISO</label>
+                <select id="form-photo-iso" name="iso">
                     <option value="100">100</option>
                     <option value="200">200</option>
                     <option value="300">300</option>
@@ -65,8 +101,8 @@
                 </select>
             </div>
             <div class="form-row">
-                <label for="form-shutter">Экспозиция, секунды</label>
-                <select id="form-shutter" name="shutter-speed-sec">
+                <label for="form-photo-shutter">Экспозиция, секунды</label>
+                <select id="form-photo-shutter" name="shutter-speed-sec">
                     <option value="1/1000">1/1000</option>
                     <option value="1/500">1/500</option>
                     <option value="1/100">1/100</option>

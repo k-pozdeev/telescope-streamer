@@ -89,13 +89,14 @@ class StreamingHttpHandler(BaseHTTPRequestHandler):
                 shutter_speed_f = float(m.group(1)) / float(m.group(2))
             else:
                 shutter_speed_f = float(data['shutter_speed_sec'])
-            photo_config = PhotoConfig(data['width'], data['height'], data['iso'], shutter_speed_f)
+            photo_config = PhotoConfig(data['width'], data['height'], data['iso'], shutter_speed_f, data['exposure_mode'])
             photo_name = f"{datetime.datetime.now():%Y-%m-%d_%H-%M-%S.jpg}"
             camera.make_photo(photo_config, photo_man.full_path(photo_name))
             content = json.dumps({"name": photo_name}).encode('UTF-8')
             config_manager.set_vals({
                 "camera_photo_resolution_x": data['width'],
                 "camera_photo_resolution_y": data['height'],
+                "camera_photo_exposure_mode": data['exposure_mode'],
                 "camera_photo_iso": data['iso'],
                 "camera_photo_shutter_speed_sec": data['shutter_speed_sec'],
             })
@@ -104,7 +105,8 @@ class StreamingHttpHandler(BaseHTTPRequestHandler):
             post_body = self.rfile.read(content_len)
             data = json.loads(post_body)
             iso = data["iso"]
-            camera.change_video_settings({"iso": iso})
+            exposure_mode = data["exposure_mode"]
+            camera.change_video_settings({"iso": iso, "exposure_mode": exposure_mode})
             content = json.dumps({"status": "ok"}).encode('UTF-8')
             config_manager.set_val("camera_video_iso", iso)
 
