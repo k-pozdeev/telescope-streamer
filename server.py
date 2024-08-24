@@ -149,6 +149,8 @@ def make_http_server(
 def make_websocket_server(server_config: ServerConfig, video_config: VideoConfig) -> WSGIServer:
     print('Initializing websockets server on port %d' % server_config.ws_port)
     WebSocketWSGIHandler.http_version = '1.1'
+    StreamingWebSocket.width = video_config.resolution_x
+    StreamingWebSocket.height = video_config.resolution_y
     websocket_server = make_server(
         '', server_config.ws_port,
         server_class=WSGIServer,
