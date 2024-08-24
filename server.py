@@ -121,8 +121,8 @@ class StreamingHttpHandler(BaseHTTPRequestHandler):
 class StreamingWebSocket(WebSocket):
     jsmpeg_magic = b'jsmp'
     jsmpeg_header = Struct('>4sHH')
-    width = None
-    height = None
+    width = 1024
+    height = 768
 
     def opened(self):
         self.send(self.jsmpeg_header.pack(self.jsmpeg_magic, self.width, self.height), binary=True)
@@ -147,8 +147,6 @@ def make_http_server(
 
 def make_websocket_server(server_config: ServerConfig, video_config: VideoConfig) -> WSGIServer:
     print('Initializing websockets server on port %d' % server_config.ws_port)
-    StreamingWebSocket.width = video_config.resolution_x
-    StreamingWebSocket.height = video_config.resolution_y
     WebSocketWSGIHandler.http_version = '1.1'
     websocket_server = make_server(
         '', server_config.ws_port,

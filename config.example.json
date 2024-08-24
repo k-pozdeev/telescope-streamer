@@ -4,8 +4,8 @@
   "server_ws_port": 8084,
 
   "camera_video_exposure_mode": "auto",
-  "camera_video_resolution_x": 640,
-  "camera_video_resolution_y": 480,
+  "camera_video_resolution_x": 1920,
+  "camera_video_resolution_y": 1080,
   "camera_video_iso": 100,
   "camera_video_frame_rate": 1,
 
