@@ -152,7 +152,7 @@ class PhotoStreamCamera(CameraBase):
         frame_duration_sec = float(1.0 / self._video_config.frame_rate)
         while True:
             before_time = time()
-            self._camera.capture(self._consumer, format='rgba', use_video_port=False)
+            self._camera.capture(self._consumer, format='jpeg', use_video_port=False)
             after_time = time()
             actual_frame_duration_sec = after_time - before_time
             if actual_frame_duration_sec < frame_duration_sec:
