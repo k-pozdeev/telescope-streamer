@@ -36,7 +36,7 @@ class Camera(CameraBase):
         return camera
 
     def start_stream(self):
-        self._camera.start_recording(self._consumer, 'h264')
+        self._camera.start_recording(self._consumer, 'yuv')
 
     def stop_stream(self):
         self._camera.stop_recording()
