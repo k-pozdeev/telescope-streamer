@@ -17,7 +17,7 @@ class PhotoManager:
     def list_photos(self) -> List[str]:
         for (root, dirs, files) in os.walk(self._photo_folder, topdown=True):
             files = [file for file in files if file != ".gitkeep"]
-            return sorted(files)
+            return sorted(files, reverse=True)
 
     def full_path(self, name: str) -> str:
         return os.path.join(self._photo_folder, name)

@@ -53,7 +53,7 @@ class StreamingHttpHandler(BaseHTTPRequestHandler):
             content = read_resource(file_name).encode('UTF-8')
         elif self.path == '/photos':
             content_type = 'application/json; charset=utf-8'
-            content = json.dumps(photo_man.list_photos().reverse()).encode('UTF-8')
+            content = json.dumps(photo_man.list_photos()).encode('UTF-8')
         elif self.path.startswith('/photo/'):
             photo_name = self.path.replace('/photo/', '')
             content = photo_man.get_photo_as_bytes(photo_name)
