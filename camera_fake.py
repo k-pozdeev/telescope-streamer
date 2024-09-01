@@ -8,7 +8,7 @@ from threading import Thread, Lock, Event
 from PIL import Image
 from random import randrange
 from camera_base import CameraBase
-from time import sleep
+from time import time, sleep
 from typing import Dict, Any
 
 
@@ -71,7 +71,9 @@ class Camera(CameraBase):
     def _generate_yuv_stream(self):
         width = self._video_config.resolution_x
         height = self._video_config.resolution_y
+        frame_duration_sec = 1.0 / self._video_config.frame_rate
         while True:
+            process_start_time = time()
             y = randrange(255) * np.ones((width, height), dtype=np.uint8)
             u = randrange(255) * np.ones((width // 2, height // 2), dtype=np.uint8)
             v = randrange(255) * np.ones((width // 2, height // 2), dtype=np.uint8)
@@ -81,6 +83,8 @@ class Camera(CameraBase):
             buff.seek(0)
 
             self._consumer.write(buff.read1())
-            Event().wait(3.0)  # sleep 3 sec
+            process_finish_time = time()
+            if process_finish_time - process_start_time < frame_duration_sec:
+                Event().wait(frame_duration_sec - (process_finish_time - process_start_time))
             if self._fake_camera_interrupt_flag:
                 break
