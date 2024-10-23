@@ -8,7 +8,7 @@ bus = smbus.SMBus(0)
 address = 0x40
 
 def write_number(value):
-    bus.write_byte(address, value)
+    bus.write_byte(address, bytes(value))
     # bus.write_byte_data(address, 0, value)
     return -1
 
@@ -33,5 +33,5 @@ while True:
     time.sleep(1)
 
     number = read_number()
-    print("Arduino: Hey RPI, I received a digit ", number)
+    print("Arduino: Hey RPI, I received a digit ", str(number))
     print("")
