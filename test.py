@@ -8,7 +8,7 @@ bus = smbus.SMBus(1)
 address = 0x40
 
 def write_number(value):
-    bus.write_byte(address, bytes(value))
+    bus.write_byte(address, bytes(value, 'utf-8'))
     # bus.write_byte_data(address, 0, value)
     return -1
 
